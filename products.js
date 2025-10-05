@@ -1,4 +1,4 @@
-import { productCardHTML, lazyObserve, delegateAddToCart, renderCartCount, cache, DEFAULT_TAXONOMY, openModal, copyToClipboard } from './app.js';
+import { productCardHTML, lazyObserve, delegateAddToCart, renderCartCount, cache, DEFAULT_TAXONOMY, openModal, copyToClipboard, waLink } from './app.js';
 import { listProducts, getCategories, getAllTags } from './firestore-helpers.js';
 
 const state = { page: 1, perPage: 12, items: [], filtered: [], categories: [] };
