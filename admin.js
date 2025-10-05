@@ -1,4 +1,4 @@
-import { seedDefaultCategoriesIfEmpty, getCategories, validateCategorySelection, createProduct, listProducts, updateProduct, softDeleteProduct, restoreProduct, hardDeleteProduct, getAllTags, createArticle, listArticles, getRSSFeeds, setRSSFeeds, upsertCategory, deleteCategory, resetCategoriesToDefault, getProductById, updateArticle, deleteArticle } from './firestore-helpers.js';
+import { seedDefaultCategoriesIfEmpty, getCategories, validateCategorySelection, createProduct, createProductLocal, listProducts, updateProduct, softDeleteProduct, restoreProduct, hardDeleteProduct, getAllTags, createArticle, listArticles, getRSSFeeds, setRSSFeeds, upsertCategory, deleteCategory, resetCategoriesToDefault, getProductById, updateArticle, deleteArticle } from './firestore-helpers.js';
 import { uploadFile, detectFormatFromName, uploadFileWithProgress } from './storage.js';
 import { ADMIN_PASSWORD, slugify, ensureUniqueSlug } from './app.js';
 
@@ -115,7 +115,8 @@ function initProductForm(){
       delete form.dataset.editId;
       toast('Updated product');
     } else {
-      await createProduct(payload);
+      try { await createProduct(payload); }
+      catch { await createProductLocal(payload); }
       toast('Saved product');
     }
     form.reset(); document.getElementById('desc').innerHTML=''; prog.value = 0; document.getElementById('previewThumbs').innerHTML='';

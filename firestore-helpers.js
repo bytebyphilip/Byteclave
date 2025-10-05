@@ -1,5 +1,6 @@
 // firestore-helpers.js - Firestore CRUD and seeding utilities
 import { db, serverTimestamp } from './firebase.js';
+import { localCreate, localUpdate, localDelete, localGet, localList, localQuery, localUpsert, localSetSettings, localGetSettings } from './localdb.js';
 import {
   collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc,
   query, where, orderBy, limit, writeBatch
@@ -25,7 +26,16 @@ export async function seedDefaultCategoriesIfEmpty() {
     });
     await batch.commit();
     return true;
-  } catch (e) { console.warn('seedDefaultCategoriesIfEmpty failed', e); return false; }
+  } catch (e) {
+    // Fallback to localdb
+    try {
+      const existing = await localList(CATEGORIES);
+      if (existing.length) return false;
+      for (const cat of DEFAULT_TAXONOMY){ await localUpsert(CATEGORIES, { id: cat.name, ...cat }); }
+      return true;
+    } catch {}
+    console.warn('seedDefaultCategoriesIfEmpty failed', e); return false;
+  }
 }
 
 export async function getCategories(fallback = DEFAULT_TAXONOMY) {
@@ -33,20 +43,27 @@ export async function getCategories(fallback = DEFAULT_TAXONOMY) {
     const snap = await getDocs(collection(db, CATEGORIES));
     if (snap.empty) return fallback.map(m => ({ id: m.name, ...m }));
     return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch (e) { return fallback.map(m => ({ id: m.name, ...m })); }
+  } catch (e) {
+    try { const rows = await localList(CATEGORIES); if (rows.length) return rows; } catch {}
+    return fallback.map(m => ({ id: m.name, ...m }));
+  }
 }
 
 // Categories CRUD for Admin
 export async function upsertCategory({ name, icon = 'category', purpose = '', subcategories = [], tags = [], format = null }) {
   if (!name) throw new Error('Category name is required');
-  const ref = doc(db, CATEGORIES, name);
-  await setDoc(ref, { name, icon, purpose, subcategories, tags, format, updatedAt: serverTimestamp() }, { merge: true });
+  try {
+    const ref = doc(db, CATEGORIES, name);
+    await setDoc(ref, { name, icon, purpose, subcategories, tags, format, updatedAt: serverTimestamp() }, { merge: true });
+  } catch {
+    await localUpsert(CATEGORIES, { id: name, name, icon, purpose, subcategories, tags, format, updatedAt: new Date().toISOString() });
+  }
 }
 
 export async function deleteCategory(name) {
   if (!name) return;
-  const ref = doc(db, CATEGORIES, name);
-  await deleteDoc(ref);
+  try { const ref = doc(db, CATEGORIES, name); await deleteDoc(ref); }
+  catch { await localDelete(CATEGORIES, name); }
 }
 
 export async function resetCategoriesToDefault(){
@@ -97,6 +114,15 @@ export async function createProduct(input) {
   };
   const ref = await addDoc(collection(db, PRODUCTS), payload);
   return { id: ref.id, ...payload };
+}
+
+// Local fallback create product
+export async function createProductLocal(input){
+  const now = new Date().toISOString();
+  const base = slugify(input.slug || input.title || 'item');
+  const payload = { ...input, createdAt: now, updatedAt: now, deleted: false };
+  const saved = await localCreate(PRODUCTS, payload);
+  return saved;
 }
 
 export async function updateProduct(id, updates) {
@@ -150,7 +176,8 @@ export async function listProducts({ category, subcategory, tags = [], search = 
     const snap = await getDocs(qref);
     items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   } catch (e) {
-    items = await (await fetch('data/sample-products.json')).json();
+    try { items = await localList(PRODUCTS); }
+    catch { items = await (await fetch('data/sample-products.json')).json(); }
   }
   // Client-side filters
   items = items.filter(p => !p.deleted && p.published !== false);
