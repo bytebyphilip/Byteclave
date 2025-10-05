@@ -90,8 +90,21 @@ function renderCounts(){
   const byCat = new Map();
   state.items.forEach(p => { byCat.set(p.category, (byCat.get(p.category)||0)+1); });
   const allNames = state.categories.map(c=>c.name);
-  const html = allNames.map(name => `<div style="display:flex;justify-content:space-between"><a href="#" data-jump-cat="${name}">${name}</a><span>${byCat.get(name)||0}</span></div>`).join('');
+  const html = allNames.map(name => `<div style=\"display:flex;justify-content:space-between\"><a href=\"#\" data-jump-cat=\"${name}\">${name}</a><span>${byCat.get(name)||0}</span></div>`).join('');
   $('catCounts').innerHTML = html;
+  // Subcategory list when a category is picked
+  const sideTitle = document.getElementById('sideTitle');
+  const subList = document.getElementById('subList');
+  const currentCat = document.getElementById('fCategory').value;
+  if (currentCat){
+    sideTitle.textContent = currentCat;
+    const cat = state.categories.find(c=>c.name===currentCat);
+    const subs = (cat && cat.subcategories)||[];
+    subList.innerHTML = subs.map(s=>`<div><a href=\"#\" data-jump-sub=\"${s}\">${s}</a></div>`).join('') || '<div class="meta">No subcategories</div>';
+  } else {
+    sideTitle.textContent = 'Categories';
+    subList.innerHTML = '';
+  }
 }
 
 function bind(){
@@ -101,6 +114,10 @@ function bind(){
   $('catCounts').addEventListener('click', (e)=>{
     const a = e.target.closest('[data-jump-cat]'); if (!a) return; e.preventDefault();
     $('fCategory').value = a.getAttribute('data-jump-cat'); updateSubcategories(); refresh();
+  });
+  document.getElementById('subList').addEventListener('click', (e)=>{
+    const a = e.target.closest('[data-jump-sub]'); if (!a) return; e.preventDefault();
+    $('fSubcategory').value = a.getAttribute('data-jump-sub'); refresh();
   });
   delegateAddToCart(document.body);
   // Copy prompt button handler

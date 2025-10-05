@@ -58,6 +58,8 @@ img{max-width:100%;display:block}
 .toast{position:fixed;right:16px;bottom:16px;background:#0f1522;border:1px solid #1a2135;padding:10px 12px;border-radius:10px}
 .lazy{filter:blur(8px);}
 .sidebar{background:#0f131c;border:1px solid #1a2030;border-radius:12px;padding:12px}
+.sidebar a{color:#cfe3ff}
+.sidebar a:hover{color:#76d7f9}
 .filters{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
 @media(max-width:900px){.filters{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:560px){.filters{grid-template-columns:1fr}}
