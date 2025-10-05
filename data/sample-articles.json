@@ -1,0 +1,46 @@
+[
+  {
+    "id": "a1",
+    "title": "AI Startups to Watch in 2025",
+    "slug": "ai-startups-2025",
+    "excerpt": "A short list of fast-growing AI startups.",
+    "body": "<p>Full article content with images and links.</p>",
+    "image": "assets/default-news.jpg",
+    "author": "ByteClave Team",
+    "publishedAt": "2025-09-18T12:00:00Z",
+    "externalUrl": null
+  },
+  {
+    "id": "a2",
+    "title": "How to choose the best prompt template",
+    "slug": "choose-best-prompt-template",
+    "excerpt": "Selecting prompt templates that work for your use-case.",
+    "body": "<p>Step-by-step guide.</p>",
+    "image": "assets/default-news.jpg",
+    "author": "Philip K.",
+    "publishedAt": "2025-09-21T09:30:00Z",
+    "externalUrl": null
+  },
+  {
+    "id": "a3",
+    "title": "Google I/O: AI announcements recap",
+    "slug": "google-io-ai-recap",
+    "excerpt": "Top AI announcements from the conference.",
+    "body": "<p>Recap content and analysis.</p>",
+    "image": "assets/default-news.jpg",
+    "author": "ByteClave Team",
+    "publishedAt": "2025-09-26T07:45:00Z",
+    "externalUrl": "https://news.google.com/articles/..."
+  },
+  {
+    "id": "a4",
+    "title": "Quick guide: converting PDFs to images",
+    "slug": "pdf-to-image-guide",
+    "excerpt": "Tools and tricks to extract PDF pages as JPG.",
+    "body": "<p>Guide content and example commands.</p>",
+    "image": "assets/default-news.jpg",
+    "author": "Philip K.",
+    "publishedAt": "2025-09-29T16:10:00Z",
+    "externalUrl": null
+  }
+]

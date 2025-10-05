@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ByteClave — Your Digital Hub for AI, Apps & Resources</title>
+  <meta name="description" content="ByteClave is a dark-themed tech marketplace and news hub for AI tools, apps, PDFs, courses, and more."/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="canonical" href="/"/>
+  <meta property="og:title" content="ByteClave — Your Digital Hub for AI, Apps & Resources"/>
+  <meta property="og:description" content="Tech marketplace + news hub"/>
+  <meta property="og:image" content="assets/default-news.jpg"/>
+</head>
+<body>
+  <header class="header">
+    <div class="inner container">
+      <div class="logo"><img src="assets/logo.png" alt="ByteClave logo"/>ByteClave</div>
+      <nav class="nav">
+        <a href="products.html">Products</a>
+        <a href="news.html">News</a>
+        <a href="cart.html">Cart</a>
+        <a href="admin.html">Admin</a>
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    <section style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;align-items:center">
+      <div>
+        <h1>ByteClave</h1>
+        <p class="muted">Your Digital Hub for AI, Apps & Resources</p>
+        <p>Explore AI PDFs, apps, tools, courses, templates, plugins, datasets, and more. Read our news hub for the latest updates.</p>
+        <div style="display:flex;gap:10px;margin-top:10px">
+          <a class="btn" href="products.html">Browse Products</a>
+          <a class="btn secondary" href="news.html">Read News</a>
+        </div>
+      </div>
+      <div class="card" style="padding:18px">
+        <h3>Quick Categories</h3>
+        <div id="quickCats" class="grid"></div>
+      </div>
+    </section>
+    <section style="margin-top:24px">
+      <h2>Featured</h2>
+      <div id="featured" class="grid"></div>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="inner container">© <span id="year"></span> ByteClave</div>
+  </footer>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
