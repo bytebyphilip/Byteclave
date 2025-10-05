@@ -29,6 +29,7 @@ async function afterLogin(){
   await initArticles();
   await initRSS();
   await initCategoriesManager();
+  initDevTools();
   const y = document.getElementById('year'); if (y) y.textContent = new Date().getFullYear();
 }
 
@@ -297,6 +298,28 @@ async function renderCategoriesTable(){
     fillCategorySelects();
     await renderCategoriesTable();
   }, { once: true });
+}
+
+// Backup/Restore and Debug
+function initDevTools(){
+  const out = document.getElementById('debugOut');
+  document.getElementById('btnExport').addEventListener('click', async ()=>{
+    try {
+      const products = await (await fetch('data/sample-products.json')).json().catch(()=>[]);
+      const articles = await (await fetch('data/sample-articles.json')).json().catch(()=>[]);
+      const blob = new Blob([JSON.stringify({ products, articles, categories }, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'byteclave-backup.json'; a.click();
+    } catch (e) { out.textContent = 'Export error: '+e.message; }
+  });
+  document.getElementById('importFile').addEventListener('change', async (ev)=>{
+    try { const f = ev.target.files[0]; if (!f) return; const text = await f.text(); const json = JSON.parse(text); out.textContent = 'Imported JSON with keys: '+Object.keys(json).join(', '); } catch (e){ out.textContent = 'Import error: '+e.message; }
+  });
+  document.getElementById('btnTestWrite').addEventListener('click', async ()=>{
+    try {
+      await createArticle({ title: 'Test Write '+Date.now(), slug: 'test-'+Date.now(), excerpt: 'debug', body: '', image: '', author: 'system', publishedAt: new Date().toISOString(), externalUrl: null });
+      out.textContent = 'Firestore write OK';
+    } catch (e) { out.textContent = 'Firestore write FAILED: '+(e.message||String(e)); }
+  });
 }
 
 if (document.readyState !== 'loading') gate(); else document.addEventListener('DOMContentLoaded', gate);

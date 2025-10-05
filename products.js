@@ -117,6 +117,11 @@ function renderCounts(){
 function bind(){
   $('fCategory').addEventListener('change', ()=>{ updateSubcategories(); refresh(); });
   ['fSubcategory','fTags','fSearch','fMin','fMax','fSort'].forEach(id=>$(id).addEventListener('input', ()=> refresh()));
+  const viewSel = document.getElementById('fView'); if (viewSel){ viewSel.addEventListener('change', ()=>{
+    const grid = document.getElementById('grid'); grid.classList.remove('cards-compact','cards-tiles');
+    if (viewSel.value==='compact') grid.classList.add('cards-compact');
+    if (viewSel.value==='tiles') grid.classList.add('cards-tiles');
+  }); }
   $('loadMore').addEventListener('click', ()=>{ state.page++; applyPagination(); });
   $('catCounts').addEventListener('click', (e)=>{
     const a = e.target.closest('[data-jump-cat]'); if (!a) return; e.preventDefault();
