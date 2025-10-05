@@ -70,3 +70,18 @@ export async function uploadFile(file, pathPrefix='uploads/'){
   const url = await getDownloadURL(storageRef);
   return url;
 }
+
+// Same as uploadFile but allows a progress callback (0-100)
+export async function uploadFileWithProgress(file, pathPrefix='uploads/', onProgress){
+  const toUpload = await compressImageIfNeeded(file);
+  const id = `${Date.now()}-${Math.random().toString(36).slice(2,8)}-${file.name}`;
+  const storageRef = ref(storage, `${pathPrefix}${id}`);
+  await new Promise((resolve, reject)=>{
+    const task = uploadBytesResumable(storageRef, toUpload);
+    task.on('state_changed', (snap)=>{
+      if (onProgress && snap.total) onProgress(Math.round((snap.bytesTransferred / snap.total) * 100));
+    }, reject, resolve);
+  });
+  const url = await getDownloadURL(storageRef);
+  return url;
+}

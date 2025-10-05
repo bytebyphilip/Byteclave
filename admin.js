@@ -1,5 +1,5 @@
 import { seedDefaultCategoriesIfEmpty, getCategories, validateCategorySelection, createProduct, listProducts, updateProduct, softDeleteProduct, restoreProduct, hardDeleteProduct, getAllTags, createArticle, listArticles, getRSSFeeds, setRSSFeeds, upsertCategory, deleteCategory, resetCategoriesToDefault, getProductById, updateArticle, deleteArticle } from './firestore-helpers.js';
-import { uploadFile, detectFormatFromName } from './storage.js';
+import { uploadFile, detectFormatFromName, uploadFileWithProgress } from './storage.js';
 import { ADMIN_PASSWORD, slugify, ensureUniqueSlug } from './app.js';
 
 function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; setTimeout(()=> t.style.display='none', 2000); }
@@ -70,19 +70,21 @@ function initProductForm(){
     if (!validateCategorySelection(category, subcategory, categories)) { toast('Invalid category/subcategory'); return; }
 
     let imageUrl = '';
+    const prog = document.getElementById('uploadProgress');
     const imageFile = document.getElementById('imageFile').files[0];
-    if (imageFile) imageUrl = await uploadFile(imageFile, 'images/');
+    if (imageFile) imageUrl = await uploadFileWithProgress(imageFile, 'images/', (v)=>{ prog.value = v; });
 
     const previewFiles = Array.from(document.getElementById('previewFiles').files||[]);
     const previewPages = [];
-    for (const f of previewFiles){ previewPages.push(await uploadFile(f, 'previews/')); }
+    const thumbs = document.getElementById('previewThumbs'); thumbs.innerHTML='';
+    for (const f of previewFiles){ const url = await uploadFileWithProgress(f, 'previews/', (v)=>{ prog.value = v; }); previewPages.push(url); const img = new Image(); img.src = url; img.style.width='64px'; img.style.height='64px'; img.style.objectFit='cover'; img.style.borderRadius='8px'; thumbs.appendChild(img); }
 
     let assetUrl = '';
     let fileSize = 0;
     let format = form.elements['format'].value;
     let externalLink = form.elements['externalLink'].value.trim();
     const assetFile = document.getElementById('assetFile').files[0];
-    if (assetFile){ assetUrl = await uploadFile(assetFile, 'assets/'); fileSize = assetFile.size; if (!format) format = detectFormatFromName(assetFile.name); }
+    if (assetFile){ assetUrl = await uploadFileWithProgress(assetFile, 'assets/', (v)=>{ prog.value = v; }); fileSize = assetFile.size; if (!format) format = detectFormatFromName(assetFile.name); }
     if (!assetFile && externalLink){
       // Format guess from link
       const u = externalLink.toLowerCase();
@@ -116,7 +118,7 @@ function initProductForm(){
       await createProduct(payload);
       toast('Saved product');
     }
-    form.reset(); document.getElementById('desc').innerHTML='';
+    form.reset(); document.getElementById('desc').innerHTML=''; prog.value = 0; document.getElementById('previewThumbs').innerHTML='';
     await renderProductsTable();
   });
 
