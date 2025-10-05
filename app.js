@@ -7,26 +7,14 @@ export const WHATSAPP_NUMBER = '+254791943551'; // change in production
 
 // Category & Subcategory taxonomy (seed)
 export const DEFAULT_TAXONOMY = [
-  { name: 'PDF', icon: 'picture_as_pdf', purpose: 'downloadable guides, ebooks, reports.',
-    subcategories: ['AI Guides','Tutorials','Cheatsheets'], tags: ['guide','pdf','ebook','ai','tutorial'], format: 'PDF' },
-  { name: 'Apps', icon: 'apps', purpose: 'mobile/desktop app packages or links.',
-    subcategories: ['Android','iOS','Desktop'], tags: ['apk','app','android','ios','desktop'], format: 'APK/APP' },
-  { name: 'Tools & Scripts', icon: 'build', purpose: 'utilities, CLI tools, browser snippets, automation.',
-    subcategories: ['CLI Tools','Web Tools','Automation Scripts'], tags: ['script','automation','cli','tool','extension'] },
-  { name: 'Courses', icon: 'school', purpose: 'video/text courses sold or free.',
-    subcategories: ['Beginner','Intermediate','Advanced'], tags: ['course','video','class','certificate'] },
-  { name: 'Templates & UI Kits', icon: 'grid_view', purpose: 'design templates and UI kits.',
-    subcategories: ['Figma','HTML/CSS','Tailwind Components'], tags: ['figma','template','ui-kit','design'] },
-  { name: 'Plugins & Extensions', icon: 'extension', purpose: 'WP plugins, VSCode, browser.',
-    subcategories: ['WordPress','VSCode','Browser (Chrome/Firefox)'], tags: ['plugin','extension','wordpress','vscode'] },
-  { name: 'AI Models & Demos', icon: 'smart_toy', purpose: 'model packages, demos, datasets.',
-    subcategories: ['Vision','NLP','Audio'], tags: ['model','nlp','vision','dataset'] },
-  { name: 'Services & Consultations', icon: 'support_agent', purpose: 'paid services like consulting.',
-    subcategories: ['Consulting','Custom Dev','Prompt Engineering'], tags: ['service','consult','dev','prompt-engineering'] },
-  { name: 'Datasets & APIs', icon: 'dns', purpose: 'downloadable datasets or API instructions.',
-    subcategories: ['Public Datasets','API Access'], tags: ['dataset','api','csv','json'] },
-  { name: 'Misc / Other', icon: 'category', purpose: 'anything else not fitting above.',
-    subcategories: [], tags: [] }
+  { name: 'AI PROMPTS', icon: 'library_books', purpose: 'Libraries, blueprints, packs, automation prompts',
+    subcategories: ['Prompt Libraries','Prompt Blueprints','Prompt Market Packs','Automation Prompts'], tags: ['prompt','library','blueprint','automation'] },
+  { name: 'AI TOOLS', icon: 'smart_toy', purpose: 'PDFs/Cheats, apps, templates, scripts, APIs',
+    subcategories: ['PDFs & Cheat Sheets','AI Applications','Templates & Tutorials','Scripts & Extensions','API Projects'], tags: ['tools','pdf','app','template','script','api'] },
+  { name: 'COURSES', icon: 'school', purpose: 'AI/ML, prompts, automation, monetization, workshops',
+    subcategories: ['AI & Machine Learning','Prompt Engineering','Automation & No-Code Tools','Tech Business & Monetization','Mini Lessons / Workshops'], tags: ['course','video','lesson'] },
+  { name: 'APPS', icon: 'apps', purpose: 'Android, Desktop, Web Tools, Extensions, Beta',
+    subcategories: ['Android Apps','Desktop Apps','Web Tools','Plug-ins & Extensions','Beta Tools / Experiments'], tags: ['app','android','desktop','web','extension','beta'] }
 ];
 
 // Basic local storage cache helpers
@@ -180,7 +168,8 @@ export async function fetchJSON(url, fallback){
 async function renderHome(){
   const quick = document.getElementById('quickCats');
   if (!quick) return;
-  quick.innerHTML = DEFAULT_TAXONOMY.slice(0,6).map(c=>`<div class="card"><div class="content"><div class="badge">${c.name}</div><p style="color:#9fb0c9">${c.purpose}</p><a class="btn ghost" href="products.html?category=${encodeURIComponent(c.name)}">Explore</a></div></div>`).join('');
+  // Prefer live categories from Firestore via helper endpoint interface (optional). For now, render defaults.
+  quick.innerHTML = DEFAULT_TAXONOMY.map(c=>`<div class=\"card\"><div class=\"content\"><div class=\"badge\">${c.name}</div><p style=\"color:#9fb0c9\">${c.purpose}</p><a class=\"btn ghost\" href=\"products.html?category=${encodeURIComponent(c.name)}\">Explore</a></div></div>`).join('');
   const featured = document.getElementById('featured');
   const products = await fetchJSON('data/sample-products.json', []);
   featured.innerHTML = products.slice(0,4).map(p=>productCardHTML(p)).join('');

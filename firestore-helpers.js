@@ -49,6 +49,17 @@ export async function deleteCategory(name) {
   await deleteDoc(ref);
 }
 
+export async function resetCategoriesToDefault(){
+  const snap = await getDocs(collection(db, CATEGORIES));
+  const batch = writeBatch(db);
+  snap.forEach(d => batch.delete(d.ref));
+  DEFAULT_TAXONOMY.forEach(cat => {
+    const ref = doc(db, CATEGORIES, cat.name);
+    batch.set(ref, { name: cat.name, icon: cat.icon || 'category', purpose: cat.purpose||'', subcategories: cat.subcategories||[], tags: cat.tags||[], format: cat.format||null, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+  });
+  await batch.commit();
+}
+
 export function validateCategorySelection(categoryName, subcategoryName, categories) {
   const c = categories.find(x => x.name === categoryName);
   if (!c) return false;
@@ -118,6 +129,13 @@ export async function getProductBySlug(slug) {
   return local.find(x => x.slug === slug) || null;
 }
 
+export async function getProductById(id){
+  const ref = doc(db, PRODUCTS, id);
+  const d = await getDoc(ref);
+  if (d.exists()) return { id: d.id, ...d.data() };
+  return null;
+}
+
 export async function listProducts({ category, subcategory, tags = [], search = '', minPrice = 0, maxPrice = Infinity, sort = 'newest', limitNum = 1000 } = {}) {
   let items = [];
   try {
@@ -175,6 +193,16 @@ export async function createArticle(input) {
   };
   const ref = await addDoc(collection(db, ARTICLES), payload);
   return { id: ref.id, ...payload };
+}
+
+export async function updateArticle(id, updates){
+  const ref = doc(db, ARTICLES, id);
+  await updateDoc(ref, { ...updates, updatedAt: new Date().toISOString() });
+}
+
+export async function deleteArticle(id){
+  const ref = doc(db, ARTICLES, id);
+  await deleteDoc(ref);
 }
 
 export async function listArticles({ limitNum = 50 } = {}) {

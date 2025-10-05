@@ -1,4 +1,4 @@
-import { seedDefaultCategoriesIfEmpty, getCategories, validateCategorySelection, createProduct, listProducts, updateProduct, softDeleteProduct, restoreProduct, hardDeleteProduct, getAllTags, createArticle, listArticles, getRSSFeeds, setRSSFeeds, upsertCategory, deleteCategory } from './firestore-helpers.js';
+import { seedDefaultCategoriesIfEmpty, getCategories, validateCategorySelection, createProduct, listProducts, updateProduct, softDeleteProduct, restoreProduct, hardDeleteProduct, getAllTags, createArticle, listArticles, getRSSFeeds, setRSSFeeds, upsertCategory, deleteCategory, resetCategoriesToDefault, getProductById, updateArticle, deleteArticle } from './firestore-helpers.js';
 import { uploadFile, detectFormatFromName } from './storage.js';
 import { ADMIN_PASSWORD, slugify, ensureUniqueSlug } from './app.js';
 
@@ -108,8 +108,14 @@ function initProductForm(){
     // Simple validations
     if (!payload.title) { toast('Title required'); return; }
     if (!payload.category) { toast('Category required'); return; }
-    const created = await createProduct(payload);
-    toast('Saved product');
+    if (form.dataset.editId){
+      await updateProduct(form.dataset.editId, payload);
+      delete form.dataset.editId;
+      toast('Updated product');
+    } else {
+      await createProduct(payload);
+      toast('Saved product');
+    }
     form.reset(); document.getElementById('desc').innerHTML='';
     await renderProductsTable();
   });
@@ -129,15 +135,37 @@ async function renderProductsTable(){
       <td>${p.price} ${p.currency}</td>
       <td>${p.deleted? 'Deleted' : (p.published? 'Published':'Draft')}</td>
       <td>
-        <a class="kbd" href="product.html?slug=${encodeURIComponent(p.slug)}" target="_blank">view</a>
-        <button class="kbd" data-del="${p.id}">soft delete</button>
-        <button class="kbd" data-res="${p.id}">restore</button>
-        <button class="kbd" data-hard="${p.id}">delete</button>
+        <a class=\"kbd\" href=\"product.html?slug=${encodeURIComponent(p.slug)}\" target=\"_blank\">view</a>
+        <button class=\"kbd\" data-edit=\"${p.id}\">edit</button>
+        <button class=\"kbd\" data-del=\"${p.id}\">soft delete</button>
+        <button class=\"kbd\" data-res=\"${p.id}\">restore</button>
+        <button class=\"kbd\" data-hard=\"${p.id}\">delete</button>
       </td>
     </tr>`));
   document.getElementById('productsTable').innerHTML = rows.join('');
   document.getElementById('productsTable').addEventListener('click', async (e)=>{
-    const d = e.target.closest('[data-del]'); const r = e.target.closest('[data-res]'); const h = e.target.closest('[data-hard]');
+    const d = e.target.closest('[data-del]'); const r = e.target.closest('[data-res]'); const h = e.target.closest('[data-hard]'); const ed = e.target.closest('[data-edit]');
+    if (ed){
+      const id = ed.getAttribute('data-edit');
+      const p = await getProductById(id);
+      if (p){
+        const form = document.getElementById('productForm');
+        form.elements['title'].value = p.title;
+        form.elements['slug'].value = p.slug;
+        form.elements['shortDescription'].value = p.shortDescription||'';
+        form.elements['price'].value = p.price||0;
+        form.elements['currency'].value = p.currency||'KES';
+        document.getElementById('catSelect').value = p.category; updateSubcategories();
+        document.getElementById('subSelect').value = p.subcategory||'';
+        form.elements['tags'].value = (p.tags||[]).join(', ');
+        document.getElementById('desc').innerHTML = p.description||'';
+        form.elements['format'].value = p.format||'';
+        form.elements['fileSize'].value = p.fileSize||0;
+        document.getElementById('published').checked = !!p.published;
+        form.dataset.editId = id;
+        toast('Loaded for edit');
+      }
+    }
     if (d){ await softDeleteProduct(d.getAttribute('data-del')); toast('Moved to trash'); await renderProductsTable(); }
     if (r){ await restoreProduct(r.getAttribute('data-res')); toast('Restored'); await renderProductsTable(); }
     if (h){ if (confirm('Permanently delete?')){ await hardDeleteProduct(h.getAttribute('data-hard')); toast('Deleted'); await renderProductsTable(); } }
@@ -206,6 +234,19 @@ async function initCategoriesManager(){
     fillCategorySelects();
     await renderCategoriesTable();
     toast('Saved category');
+  });
+  // Reset defaults button
+  const resetBtn = document.createElement('button');
+  resetBtn.className = 'btn ghost';
+  resetBtn.textContent = 'Reset Defaults';
+  form.parentElement.insertBefore(resetBtn, form.nextSibling);
+  resetBtn.addEventListener('click', async ()=>{
+    if (!confirm('Reset categories to defaults?')) return;
+    await resetCategoriesToDefault();
+    categories = await getCategories();
+    fillCategorySelects();
+    await renderCategoriesTable();
+    toast('Categories reset');
   });
 }
 
