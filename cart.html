@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Cart — ByteClave</title>
+  <meta name="description" content="Checkout via WhatsApp"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<header class="header">
+  <div class="inner container">
+    <div class="logo"><img src="assets/logo.png" alt=""/>ByteClave</div>
+    <nav class="nav">
+      <a href="products.html">Products</a>
+      <a href="news.html">News</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <h2>Your Cart</h2>
+  <div id="items"></div>
+  <div id="total" style="margin:12px 0"></div>
+  <div style="display:flex;gap:10px">
+    <a id="checkout" class="btn" target="_blank">Checkout on WhatsApp</a>
+    <button id="clear" class="btn secondary">Clear cart</button>
+  </div>
+</main>
+<footer class="footer"><div class="inner container">© <span id="year"></span> ByteClave</div></footer>
+<script type="module">
+  import { getCart, saveCart, removeFromCart, clearCart, cartWhatsAppLink } from './app.js';
+  function render(){
+    const c = getCart();
+    const container = document.getElementById('items');
+    if (!c.items.length){ container.innerHTML = '<p>Your cart is empty.</p>'; }
+    else {
+      container.innerHTML = c.items.map(i=>`<div class="card" style="padding:10px;display:flex;align-items:center;gap:12px">
+        <img src="${i.image}" alt="${i.title}" style="width:60px;height:60px;object-fit:cover;border-radius:8px"/>
+        <div style="flex:1">
+          <div>${i.title}</div>
+          <div class="meta">${i.price} ${i.currency} × ${i.qty}</div>
+        </div>
+        <button class="btn ghost" data-remove="${i.slug}">Remove</button>
+      </div>`).join('');
+    }
+    const total = c.items.reduce((a,b)=>a+(b.price*b.qty),0);
+    document.getElementById('total').textContent = `Total: ${total} KES`;
+    document.getElementById('checkout').setAttribute('href', cartWhatsAppLink());
+  }
+  document.getElementById('items').addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-remove]'); if (!btn) return; removeFromCart(btn.getAttribute('data-remove')); render();
+  });
+  document.getElementById('clear').addEventListener('click', ()=>{ clearCart(); render(); });
+  render();
+  const y = document.getElementById('year'); if (y) y.textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

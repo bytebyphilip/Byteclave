@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Admin — ByteClave</title>
+  <meta name="description" content="Admin dashboard"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<header class="header">
+  <div class="inner container">
+    <div class="logo"><img src="assets/logo.png" alt=""/>ByteClave</div>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="news.html">News</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <div id="gate" class="card" style="padding:16px">
+    <h3>Admin Login</h3>
+    <div class="field"><div class="label">Password</div><input id="pwd" class="input" type="password" placeholder="Enter password"/></div>
+    <button id="btnLogin" class="btn">Login</button>
+    <div class="meta" style="margin-top:6px">Hint: 1234 (dev)</div>
+  </div>
+
+  <section id="dashboard" style="display:none">
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <button class="btn" data-tab="products">Products</button>
+      <button class="btn secondary" data-tab="articles">Articles</button>
+      <button class="btn secondary" data-tab="categories">Categories</button>
+      <button class="btn secondary" data-tab="rss">RSS</button>
+    </div>
+
+    <div id="tab-products">
+      <div class="card" style="padding:16px">
+        <h3>Add / Edit Product</h3>
+        <form id="productForm">
+          <div class="row">
+            <div class="field"><div class="label">Title</div><input name="title" class="input" required/></div>
+            <div class="field"><div class="label">Slug (auto)</div><input name="slug" class="input"/></div>
+          </div>
+          <div class="row">
+            <div class="field"><div class="label">Short Description</div><input name="shortDescription" class="input"/></div>
+            <div class="field"><div class="label">Price</div><input name="price" type="number" class="input"/></div>
+          </div>
+          <div class="row">
+            <div class="field"><div class="label">Currency</div><input name="currency" class="input" value="KES"/></div>
+            <div class="field"><div class="label">License</div><input name="license" class="input"/></div>
+          </div>
+          <div class="row">
+            <div class="field"><div class="label">Category</div><select name="category" id="catSelect"></select></div>
+            <div class="field"><div class="label">Subcategory</div><select name="subcategory" id="subSelect"></select></div>
+          </div>
+          <div class="field"><div class="label">Tags (comma-separated)</div><input name="tags" class="input"/></div>
+          <div class="field"><div class="label">Long Description</div><div id="desc" contenteditable="true" style="min-height:120px" class="input"></div></div>
+          <div class="row">
+            <div class="field"><div class="label">Thumbnail Image</div><input type="file" id="imageFile" accept="image/*"/></div>
+            <div class="field"><div class="label">Preview Pages (1–6)</div><input type="file" id="previewFiles" accept="image/*" multiple/></div>
+          </div>
+          <div class="row">
+            <div class="field"><div class="label">Product File (PDF/APK/ZIP etc)</div><input type="file" id="assetFile"/></div>
+            <div class="field"><div class="label">Format</div><input name="format" class="input"/></div>
+          </div>
+          <div class="field"><div class="label">External Store/Link (optional)</div><input name="externalLink" class="input" placeholder="https://..."/></div>
+          <div class="row">
+            <div class="field"><div class="label">File Size (KB/MB)</div><input name="fileSize" type="number" class="input"/></div>
+            <div class="field"><label><input type="checkbox" id="published"/> Published</label></div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button type="submit" class="btn">Save</button>
+            <button type="button" id="resetForm" class="btn secondary">Reset</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card" style="padding:16px;margin-top:12px">
+        <h3>Products</h3>
+        <table class="table" id="productsTable"></table>
+      </div>
+    </div>
+
+    <div id="tab-articles" style="display:none">
+      <div class="card" style="padding:16px">
+        <h3>Add Article</h3>
+        <form id="articleForm">
+          <div class="row">
+            <div class="field"><div class="label">Title</div><input name="title" class="input" required/></div>
+            <div class="field"><div class="label">Slug</div><input name="slug" class="input"/></div>
+          </div>
+          <div class="row">
+            <div class="field"><div class="label">Excerpt</div><input name="excerpt" class="input"/></div>
+            <div class="field"><div class="label">Author</div><input name="author" class="input"/></div>
+          </div>
+          <div class="field"><div class="label">Body</div><div id="abody" contenteditable="true" class="input" style="min-height:120px"></div></div>
+          <div class="row">
+            <div class="field"><div class="label">Image</div><input type="file" id="aimage" accept="image/*"/></div>
+            <div class="field"><div class="label">Published At</div><input type="datetime-local" id="apub" class="input"/></div>
+          </div>
+          <div style="display:flex;gap:10px"><button class="btn" type="submit">Save</button></div>
+        </form>
+      </div>
+      <div class="card" style="padding:16px;margin-top:12px">
+        <h3>Articles</h3>
+        <table class="table" id="articlesTable"></table>
+      </div>
+    </div>
+
+    <div id="tab-categories" style="display:none">
+      <div class="card" style="padding:16px">
+        <h3>Categories Manager</h3>
+        <form id="catForm" class="row">
+          <div class="field"><div class="label">Name</div><input name="name" class="input"/></div>
+          <div class="field"><div class="label">Icon</div><input name="icon" class="input"/></div>
+          <div class="field" style="grid-column:1/3"><div class="label">Subcategories (comma)</div><input name="subcategories" class="input"/></div>
+          <div class="field" style="grid-column:1/3"><div class="label">Tags (comma)</div><input name="tags" class="input"/></div>
+          <div><button class="btn" type="submit">Add/Update</button></div>
+        </form>
+        <table class="table" id="catsTable" style="margin-top:12px"></table>
+      </div>
+    </div>
+
+    <div id="tab-rss" style="display:none">
+      <div class="card" style="padding:16px">
+        <h3>RSS Manager</h3>
+        <div class="field"><div class="label">Feed URLs (one per line)</div><textarea id="feeds" rows="6" class="input"></textarea></div>
+        <div style="display:flex;gap:10px">
+          <button id="saveFeeds" class="btn">Save</button>
+          <button id="refreshNow" class="btn secondary">Refresh RSS</button>
+        </div>
+        <div class="meta" style="margin-top:8px">Optional proxy: deploy <code>rss-proxy.js</code> as serverless function.</div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast" style="display:none"></div>
+  </section>
+</main>
+<footer class="footer"><div class="inner container">© <span id="year"></span> ByteClave</div></footer>
+<script type="module" src="admin.js"></script>
+</body>
+</html>

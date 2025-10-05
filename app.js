@@ -120,6 +120,10 @@ async function renderHome(){
   const featured = document.getElementById('featured');
   const products = await fetchJSON('data/sample-products.json', []);
   featured.innerHTML = products.slice(0,4).map(p=>productCardHTML(p)).join('');
+  // cache for Add to cart delegation
+  cache.set('products_cache', products);
+  // enable add-to-cart buttons
+  delegateAddToCart(document.body);
   lazyObserve();
   const y = document.getElementById('year'); if (y) y.textContent = new Date().getFullYear();
 }
@@ -127,15 +131,17 @@ async function renderHome(){
 export function productCardHTML(p){
   const price = p.price>0? `<span class="price">${p.price} ${p.currency}</span>` : `<span class="badge free">FREE</span>`;
   const sub = p.subcategory? `<div class="meta">${p.subcategory}</div>`:'';
+  const pdfControls = (p.category === 'PDF' && p.fileLink) ? `<button class=\"btn ghost\" data-preview=\"${encodeURIComponent(p.fileLink)}\">Preview</button>` : '';
+  const catBadge = p.category === 'PDF' ? `📄 ${p.category}` : p.category;
   return `<article class="card">
     <a href="product.html?slug=${encodeURIComponent(p.slug)}" class="thumb"><img data-src="${p.image}" alt="${p.title}"/></a>
     <div class="content">
-      <div class="badge">${p.category}</div>
+      <div class="badge">${catBadge}</div>
       <h3><a href="product.html?slug=${encodeURIComponent(p.slug)}">${p.title}</a></h3>
       ${sub}
       <p style="color:#9fb0c9">${p.shortDescription}</p>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
-        ${price}
+        <div style="display:flex;gap:8px;align-items:center">${price}${pdfControls? `<span style=\"margin-left:8px\"></span>${pdfControls}`:''}</div>
         <button class="btn" data-add="${p.slug}">Add to cart</button>
       </div>
     </div>
@@ -152,5 +158,37 @@ export function delegateAddToCart(root){
     if (p) addToCart(p,1);
   });
 }
+
+// Preview overlay for PDF
+function ensureOverlay(){
+  let o = document.getElementById('previewOverlay');
+  if (o) return o;
+  o = document.createElement('div');
+  o.id = 'previewOverlay';
+  o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;z-index:9999;';
+  o.innerHTML = `<div style="position:absolute;inset:5%;background:#0b0d12;border:1px solid #1a2030;border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+    <div style="padding:8px;display:flex;justify-content:flex-end"><button id="closePreview" class="btn secondary">Close</button></div>
+    <iframe id="previewFrame" style="flex:1;border:0;background:#111" src="about:blank"></iframe>
+  </div>`;
+  document.body.appendChild(o);
+  o.addEventListener('click', (e)=>{ if (e.target.id==='previewOverlay') o.style.display='none'; });
+  o.querySelector('#closePreview').addEventListener('click', ()=> o.style.display='none');
+  return o;
+}
+export function showPreview(url){
+  const o = ensureOverlay();
+  const f = o.querySelector('#previewFrame');
+  f.src = url;
+  o.style.display = 'block';
+}
+
+// Delegate preview clicks globally
+document.addEventListener('click', (e)=>{
+  const t = e.target.closest('[data-preview]');
+  if (!t) return;
+  e.preventDefault();
+  const link = decodeURIComponent(t.getAttribute('data-preview'));
+  showPreview(link);
+});
 
 if (document.readyState !== 'loading') renderHome(); else document.addEventListener('DOMContentLoaded', renderHome);

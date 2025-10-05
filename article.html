@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Article — ByteClave</title>
+  <meta name="description" content="Article detail"/>
+  <link rel="stylesheet" href="style.css"/>
+  <meta property="og:title" content="Article — ByteClave"/>
+  <meta property="og:description" content="Article detail"/>
+  <meta property="og:image" content="assets/default-news.jpg"/>
+  <link rel="canonical" href="article.html"/>
+</head>
+<body>
+<header class="header">
+  <div class="inner container">
+    <div class="logo"><img src="assets/logo.png" alt=""/>ByteClave</div>
+    <nav class="nav">
+      <a href="products.html">Products</a>
+      <a href="news.html">News</a>
+      <a href="cart.html">Cart <span id="cartCount" class="badge"></span></a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <article class="card" style="padding:16px">
+    <h1 id="title"></h1>
+    <div class="meta" id="meta"></div>
+    <img id="image" alt=""/>
+    <div id="body"></div>
+  </article>
+</main>
+<footer class="footer"><div class="inner container">© <span id="year"></span> ByteClave</div></footer>
+<script type="module">
+  import { getArticleBySlug } from './firestore-helpers.js';
+  import { setMeta, renderCartCount } from './app.js';
+  const slug = new URLSearchParams(location.search).get('slug');
+  const a = await getArticleBySlug(slug);
+  if (!a) { document.getElementById('title').textContent = 'Not found'; }
+  else {
+    document.getElementById('title').textContent = a.title;
+    document.getElementById('meta').textContent = new Date(a.publishedAt).toLocaleString() + (a.author? ' · ' + a.author : '');
+    document.getElementById('image').src = a.image || 'assets/default-news.jpg';
+    document.getElementById('body').innerHTML = a.body || '';
+    setMeta({ title: `${a.title} — ByteClave`, description: a.excerpt || '', image: a.image, url: location.href });
+  }
+  renderCartCount();
+  const y = document.getElementById('year'); if (y) y.textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Products — ByteClave</title>
+  <meta name="description" content="Browse AI PDFs, apps, tools, courses and more."/>
+  <link rel="stylesheet" href="style.css"/>
+  <meta property="og:title" content="Products — ByteClave"/>
+  <meta property="og:description" content="Tech marketplace"/>
+  <meta property="og:image" content="assets/default-news.jpg"/>
+</head>
+<body>
+<header class="header">
+  <div class="inner container">
+    <div class="logo"><img src="assets/logo.png" alt=""/>ByteClave</div>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="news.html">News</a>
+      <a href="cart.html">Cart <span id="cartCount" class="badge"></span></a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </div>
+</header>
+<main class="container" style="display:grid;grid-template-columns:260px 1fr;gap:16px">
+  <aside class="sidebar">
+    <h3>Categories</h3>
+    <div id="catCounts"></div>
+  </aside>
+  <section>
+    <div class="filters">
+      <div>
+        <div class="label">Category</div>
+        <select id="fCategory"></select>
+      </div>
+      <div>
+        <div class="label">Subcategory</div>
+        <select id="fSubcategory"></select>
+      </div>
+      <div>
+        <div class="label">Tags</div>
+        <input id="fTags" class="input" placeholder="e.g. ai, template"/>
+      </div>
+      <div>
+        <div class="label">Search</div>
+        <input id="fSearch" class="input" placeholder="Search products"/>
+      </div>
+      <div>
+        <div class="label">Price range (KES)</div>
+        <div class="row">
+          <input id="fMin" type="number" class="input" placeholder="Min"/>
+          <input id="fMax" type="number" class="input" placeholder="Max"/>
+        </div>
+      </div>
+      <div>
+        <div class="label">Sort</div>
+        <select id="fSort">
+          <option value="newest">Newest</option>
+          <option value="price-asc">Price Low→High</option>
+          <option value="price-desc">Price High→Low</option>
+          <option value="popular">Popular</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin:12px 0; color:#9fb0c9" id="count"></div>
+    <div id="grid" class="grid"></div>
+    <div style="text-align:center;margin:16px"><button id="loadMore" class="btn secondary">Load more</button></div>
+  </section>
+</main>
+<footer class="footer"><div class="inner container">© <span id="year"></span> ByteClave</div></footer>
+<script type="module" src="products.js"></script>
+</body>
+</html>

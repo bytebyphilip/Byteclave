@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>News — ByteClave</title>
+  <meta name="description" content="Latest AI and tech news and articles."/>
+  <link rel="stylesheet" href="style.css"/>
+  <meta property="og:title" content="News — ByteClave"/>
+  <meta property="og:description" content="AI news hub"/>
+  <meta property="og:image" content="assets/default-news.jpg"/>
+</head>
+<body>
+<header class="header">
+  <div class="inner container">
+    <div class="logo"><img src="assets/logo.png" alt=""/>ByteClave</div>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="cart.html">Cart <span id="cartCount" class="badge"></span></a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <div style="display:flex;gap:16px;align-items:center;justify-content:space-between">
+    <h2>News & Articles</h2>
+    <div>
+      <input id="q" class="input" placeholder="Search articles"/>
+      <button id="refreshRSS" class="btn secondary">Refresh RSS</button>
+    </div>
+  </div>
+  <div id="articles" class="grid" style="margin-top:12px"></div>
+</main>
+<footer class="footer"><div class="inner container">© <span id="year"></span> ByteClave</div></footer>
+<script type="module" src="news.js"></script>
+</body>
+</html>
