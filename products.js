@@ -102,6 +102,12 @@ function bind(){
   document.body.addEventListener('click', (e)=>{
     const c = e.target.closest('[data-copy]'); if (c){ copyToClipboard(c.getAttribute('data-copy')); c.textContent = 'Copied'; setTimeout(()=> c.textContent='Copy', 1200); }
   });
+  // Inline iframe preview buttons
+  document.body.addEventListener('click', (e)=>{
+    const i = e.target.closest('[data-iframe]'); if (!i) return; e.preventDefault();
+    const src = i.getAttribute('data-iframe');
+    openModal(`<iframe src="${src}" style="width:100%;height:70vh;border:0;background:#0b0d12"></iframe>`);
+  });
 }
 
 async function main(){
