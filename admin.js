@@ -201,12 +201,38 @@ async function initArticles(){
 
 async function renderArticlesTable(){
   const items = await listArticles({ limitNum: 200 });
-  const rows = [`<tr><th>Title</th><th>Published</th><th>Link</th></tr>`].concat(items.map(a=>`<tr>
-    <td>${a.title}</td>
+  const rows = [`<tr><th><input type=\"checkbox\" id=\"aSelectAll\"></th><th>Title</th><th>Published</th><th>Actions</th></tr>`]
+    .concat(items.map(a=>`<tr>
+    <td><input type=\"checkbox\" data-row=\"${a.id||a.slug}\"></td>
+    <td contenteditable data-edit-title=\"${a.id||a.slug}\">${a.title}</td>
     <td>${new Date(a.publishedAt).toLocaleString()}</td>
-    <td><a class="kbd" target="_blank" href="${a.externalUrl? a.externalUrl : `article.html?slug=${encodeURIComponent(a.slug)}`}">open</a></td>
+    <td>
+      <a class=\"kbd\" target=\"_blank\" href=\"${a.externalUrl? a.externalUrl : `article.html?slug=${encodeURIComponent(a.slug)}`}\">open</a>
+      <button class=\"kbd\" data-update-article=\"${a.id||''}\">save</button>
+      <button class=\"kbd\" data-del-article=\"${a.id||''}\">delete</button>
+    </td>
   </tr>`));
-  document.getElementById('articlesTable').innerHTML = rows.join('');
+  const table = document.getElementById('articlesTable');
+  table.innerHTML = rows.join('');
+  table.addEventListener('click', async (e)=>{
+    const u = e.target.closest('[data-update-article]');
+    const d = e.target.closest('[data-del-article]');
+    if (u){
+      const id = u.getAttribute('data-update-article');
+      const cell = table.querySelector(`[data-edit-title=\"${id}\"]`);
+      await updateArticle(id, { title: cell.textContent.trim() });
+      toast('Article updated');
+    }
+    if (d){
+      const id = d.getAttribute('data-del-article');
+      if (!confirm('Delete article?')) return;
+      await deleteArticle(id);
+      await renderArticlesTable();
+      toast('Article deleted');
+    }
+  }, { once: true });
+  // Bulk select
+  const selAll = document.getElementById('aSelectAll'); if (selAll){ selAll.addEventListener('change', ()=>{ table.querySelectorAll('input[type="checkbox"][data-row]').forEach(cb=>{ cb.checked = selAll.checked; }); }); }
 }
 
 async function initRSS(){
