@@ -1,4 +1,4 @@
-import { productCardHTML, lazyObserve, delegateAddToCart, renderCartCount, cache, DEFAULT_TAXONOMY } from './app.js';
+import { productCardHTML, lazyObserve, delegateAddToCart, renderCartCount, cache, DEFAULT_TAXONOMY, openModal, copyToClipboard } from './app.js';
 import { listProducts, getCategories, getAllTags } from './firestore-helpers.js';
 
 const state = { page: 1, perPage: 12, items: [], filtered: [], categories: [] };
@@ -56,7 +56,17 @@ async function refresh(){
 function applyPagination(){
   const start = 0; const end = state.page * state.perPage;
   state.filtered = state.items.slice(0, end);
-  $('grid').innerHTML = state.filtered.map(productCardHTML).join('');
+  const cat = $('fCategory').value;
+  const sub = $('fSubcategory').value;
+  if (cat === 'AI PROMPTS') {
+    $('grid').innerHTML = state.filtered.map(promptCardHTML).join('');
+  } else if (cat === 'AI TOOLS' && sub === 'PDFs & Cheat Sheets'){
+    $('grid').innerHTML = state.filtered.map(pdfCheatCardHTML).join('');
+  } else if (cat === 'AI TOOLS' && sub === 'Scripts & Extensions'){
+    $('grid').innerHTML = state.filtered.map(scriptCardHTML).join('');
+  } else {
+    $('grid').innerHTML = state.filtered.map(productCardHTML).join('');
+  }
   $('count').textContent = `${state.items.length} items`;
   lazyObserve();
 }
@@ -78,6 +88,10 @@ function bind(){
     $('fCategory').value = a.getAttribute('data-jump-cat'); updateSubcategories(); refresh();
   });
   delegateAddToCart(document.body);
+  // Copy prompt button handler
+  document.body.addEventListener('click', (e)=>{
+    const c = e.target.closest('[data-copy]'); if (c){ copyToClipboard(c.getAttribute('data-copy')); c.textContent = 'Copied'; setTimeout(()=> c.textContent='Copy', 1200); }
+  });
 }
 
 async function main(){
@@ -88,3 +102,47 @@ async function main(){
 }
 
 if (document.readyState !== 'loading') main(); else document.addEventListener('DOMContentLoaded', main);
+
+// Category-specific renderers
+function promptCardHTML(p){
+  const tags = (p.tags||[]).map(t=>`<span class=\"badge\">${t}</span>`).join(' ');
+  return `<article class=\"card\">
+    <div class=\"content\">
+      <div class=\"badge\">${p.subcategory||'Prompt'}</div>
+      <h3>${p.title}</h3>
+      <p style=\"color:#9fb0c9\">${p.shortDescription||''}</p>
+      <div style=\"display:flex;gap:8px;flex-wrap:wrap\">${tags}</div>
+      <div style=\"margin-top:8px;display:flex;gap:8px\">
+        <button class=\"btn\" data-copy=\"${(p.description||'').replace(/<[^>]+>/g,'').slice(0,300)}\">Copy</button>
+        ${p.fileLink? `<a class=\"btn secondary\" target=\"_blank\" href=\"${p.fileLink}\">View</a>`:''}
+      </div>
+    </div>
+  </article>`;
+}
+
+function pdfCheatCardHTML(p){
+  return `<article class=\"card\">
+    <a href=\"#\" class=\"thumb\" data-preview=\"${encodeURIComponent(p.fileLink||'')}\"><img data-src=\"${p.image}\" alt=\"${p.title}\"/></a>
+    <div class=\"content\">
+      <div class=\"badge\">PDF</div>
+      <h3>${p.title}</h3>
+      <p style=\"color:#9fb0c9\">${p.shortDescription||''}</p>
+      <div style=\"display:flex;gap:8px\">
+        ${p.fileLink? `<button class=\"btn ghost\" data-preview=\"${encodeURIComponent(p.fileLink)}\">Preview</button>`:''}
+        ${p.fileLink? `<a class=\"btn\" target=\"_blank\" href=\"${p.fileLink}\">Download</a>`:''}
+      </div>
+    </div>
+  </article>`;
+}
+
+function scriptCardHTML(p){
+  return `<article class=\"card\" style=\"padding:12px\">
+    <div class=\"badge\">Script</div>
+    <h3>${p.title}</h3>
+    <p style=\"color:#9fb0c9\">${p.shortDescription||''}</p>
+    <div style=\"display:flex;gap:8px\">
+      ${p.fileLink? `<a class=\"btn\" target=\"_blank\" href=\"${p.fileLink}\">GitHub / Download</a>`:''}
+      <button class=\"btn ghost\" data-copy=\"${(p.description||'').replace(/<[^>]+>/g,'').slice(0,300)}\">Copy Snippet</button>
+    </div>
+  </article>`;
+}

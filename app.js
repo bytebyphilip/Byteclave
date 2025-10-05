@@ -244,6 +244,28 @@ document.addEventListener('click', (e)=>{
   showPreview(link);
 });
 
+// Generic modal for custom content
+function ensureModal(){
+  let m = document.getElementById('modalOverlay');
+  if (m) return m;
+  m = document.createElement('div');
+  m.id = 'modalOverlay';
+  m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;z-index:10000;';
+  m.innerHTML = `<div style="position:absolute;inset:8% 12%;background:#0e1320;border:1px solid #1a2030;border-radius:12px;display:flex;flex-direction:column;overflow:auto">
+    <div style="padding:10px;display:flex;justify-content:flex-end"><button id="closeModal" class="btn secondary">Close</button></div>
+    <div id="modalContent" style="padding:16px"></div>
+  </div>`;
+  document.body.appendChild(m);
+  m.addEventListener('click', (e)=>{ if (e.target.id==='modalOverlay') closeModal(); });
+  m.querySelector('#closeModal').addEventListener('click', closeModal);
+  return m;
+}
+export function openModal(html){ const m = ensureModal(); m.querySelector('#modalContent').innerHTML = html; m.style.display='block'; }
+export function closeModal(){ const m = document.getElementById('modalOverlay'); if (m) m.style.display='none'; }
+
+// Clipboard helper
+export async function copyToClipboard(text){ try { await navigator.clipboard.writeText(text); } catch {} }
+
 function boot(){
   initLayout();
   renderHome();
