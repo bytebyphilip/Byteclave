@@ -7,15 +7,20 @@ export const WHATSAPP_NUMBER = '+254791943551'; // change in production
 
 // Category & Subcategory taxonomy (seed)
 export const DEFAULT_TAXONOMY = [
-  { name: 'AI PROMPTS', icon: 'library_books', purpose: 'Libraries, blueprints, packs, automation prompts',
+  { name: 'AI PROMPTS', icon: 'library_books', emoji: '📚', accent: '#76d7f9', purpose: 'Libraries, blueprints, packs, automation prompts',
     subcategories: ['Prompt Libraries','Prompt Blueprints','Prompt Market Packs','Automation Prompts'], tags: ['prompt','library','blueprint','automation'] },
-  { name: 'AI TOOLS', icon: 'smart_toy', purpose: 'PDFs/Cheats, apps, templates, scripts, APIs',
+  { name: 'AI TOOLS', icon: 'smart_toy', emoji: '🤖', accent: '#b27dfb', purpose: 'PDFs/Cheats, apps, templates, scripts, APIs',
     subcategories: ['PDFs & Cheat Sheets','AI Applications','Templates & Tutorials','Scripts & Extensions','API Projects'], tags: ['tools','pdf','app','template','script','api'] },
-  { name: 'COURSES', icon: 'school', purpose: 'AI/ML, prompts, automation, monetization, workshops',
+  { name: 'COURSES', icon: 'school', emoji: '🎓', accent: '#f29d49', purpose: 'AI/ML, prompts, automation, monetization, workshops',
     subcategories: ['AI & Machine Learning','Prompt Engineering','Automation & No-Code Tools','Tech Business & Monetization','Mini Lessons / Workshops'], tags: ['course','video','lesson'] },
-  { name: 'APPS', icon: 'apps', purpose: 'Android, Desktop, Web Tools, Extensions, Beta',
+  { name: 'APPS', icon: 'apps', emoji: '📱', accent: '#47d787', purpose: 'Android, Desktop, Web Tools, Extensions, Beta',
     subcategories: ['Android Apps','Desktop Apps','Web Tools','Plug-ins & Extensions','Beta Tools / Experiments'], tags: ['app','android','desktop','web','extension','beta'] }
 ];
+
+export function getCategoryMeta(name){
+  const c = DEFAULT_TAXONOMY.find(x=>x.name===name);
+  return c || { name, emoji: '🧩', accent: '#7aa2f7', icon: 'category', purpose: '' };
+}
 
 // Basic local storage cache helpers
 export const cache = {

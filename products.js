@@ -1,4 +1,4 @@
-import { productCardHTML, lazyObserve, delegateAddToCart, renderCartCount, cache, DEFAULT_TAXONOMY, openModal, copyToClipboard, waLink } from './app.js';
+import { productCardHTML, lazyObserve, delegateAddToCart, renderCartCount, cache, DEFAULT_TAXONOMY, openModal, copyToClipboard, waLink, getCategoryMeta } from './app.js';
 import { listProducts, getCategories, getAllTags } from './firestore-helpers.js';
 
 const state = { page: 1, perPage: 12, items: [], filtered: [], categories: [] };
@@ -60,7 +60,11 @@ function applyPagination(){
   const sub = $('fSubcategory').value;
   // Category hero/sections
   const hero = $('categoryHero'); const sections = $('catSections'); const gridWrap = document.getElementById('gridWrap');
-  if (cat){ hero.style.display='block'; hero.classList.add('hero-banner'); hero.innerHTML = `<h3>${cat}</h3><p style="color:#9fb0c9">${(state.categories.find(c=>c.name===cat)||{}).purpose||''}</p>`; }
+  if (cat){
+    const meta = getCategoryMeta(cat);
+    hero.style.display='block'; hero.classList.add('hero-banner');
+    hero.innerHTML = `<div style=\"display:flex;align-items:center;gap:10px\"><span style=\"font-size:22px\">${meta.emoji||''}</span><h3 style=\"margin:0\">${cat}</h3></div><p style=\"color:#9fb0c9\">${(state.categories.find(c=>c.name===cat)||{}).purpose||meta.purpose||''}</p>`;
+  }
   else { hero.style.display='none'; }
   sections.style.display = 'none';
   if (cat === 'AI PROMPTS') {
@@ -90,7 +94,10 @@ function renderCounts(){
   const byCat = new Map();
   state.items.forEach(p => { byCat.set(p.category, (byCat.get(p.category)||0)+1); });
   const allNames = state.categories.map(c=>c.name);
-  const html = allNames.map(name => `<div style=\"display:flex;justify-content:space-between\"><a href=\"#\" data-jump-cat=\"${name}\">${name}</a><span>${byCat.get(name)||0}</span></div>`).join('');
+  const html = allNames.map(name => {
+    const meta = getCategoryMeta(name);
+    return `<div style=\"display:flex;justify-content:space-between\"><a href=\"#\" data-jump-cat=\"${name}\">${meta.emoji||''} ${name}</a><span>${byCat.get(name)||0}</span></div>`;
+  }).join('');
   $('catCounts').innerHTML = html;
   // Subcategory list when a category is picked
   const sideTitle = document.getElementById('sideTitle');
