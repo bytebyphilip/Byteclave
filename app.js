@@ -147,6 +147,11 @@ export function cartWhatsAppLink(){
   return `https://wa.me/${num}?text=${msg}`;
 }
 
+export function waLink(message){
+  const num = WHATSAPP_NUMBER.replace(/[^0-9]/g,'');
+  return `https://wa.me/${num}?text=${encodeURIComponent(message)}`;
+}
+
 // Lazy loading images
 export function lazyObserve(){
   const obs = new IntersectionObserver((entries)=>{

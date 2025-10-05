@@ -64,6 +64,16 @@ function applyPagination(){
     $('grid').innerHTML = state.filtered.map(pdfCheatCardHTML).join('');
   } else if (cat === 'AI TOOLS' && sub === 'Scripts & Extensions'){
     $('grid').innerHTML = state.filtered.map(scriptCardHTML).join('');
+  } else if (cat === 'AI TOOLS' && sub === 'AI Applications'){
+    $('grid').innerHTML = state.filtered.map(appToolCardHTML).join('');
+  } else if (cat === 'AI TOOLS' && sub === 'Templates & Tutorials'){
+    $('grid').innerHTML = state.filtered.map(templateCardHTML).join('');
+  } else if (cat === 'AI TOOLS' && sub === 'API Projects'){
+    $('grid').innerHTML = state.filtered.map(apiProjectCardHTML).join('');
+  } else if (cat === 'COURSES'){
+    $('grid').innerHTML = state.filtered.map(courseCardHTML).join('');
+  } else if (cat === 'APPS'){
+    $('grid').innerHTML = state.filtered.map(appsVariantCardHTML).join('');
   } else {
     $('grid').innerHTML = state.filtered.map(productCardHTML).join('');
   }
