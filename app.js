@@ -58,6 +58,70 @@ export function ensureUniqueSlug(base, existing) {
   return candidate;
 }
 
+// Global layout: splash, navbar hamburger, drawer, footer
+function buildDrawerHTML(){
+  const drawer = document.getElementById('drawer');
+  if (!drawer) return;
+  const wa = WHATSAPP_NUMBER.replace(/[^0-9]/g,'');
+  drawer.innerHTML = `
+    <h3 style="margin-top:0">ByteClave</h3>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="products.html?category=${encodeURIComponent('Tools & Scripts')}">AI Tools</a>
+      <a href="products.html?category=Apps">Apps</a>
+      <a href="products.html?category=Courses">Courses</a>
+      <a href="news.html">Articles / News</a>
+      <a href="index.html#about">About ByteClave</a>
+      <a href="https://wa.me/${wa}" target="_blank" rel="noopener">Contact / WhatsApp</a>
+      <hr style="border-color:#1a2030"/>
+      <a href="admin.html">Admin Dashboard</a>
+    </nav>`;
+}
+
+function bindDrawer(){
+  const btn = document.getElementById('menuBtn');
+  const drawer = document.getElementById('drawer');
+  const overlay = document.getElementById('drawerOverlay');
+  if (!btn || !drawer || !overlay) return;
+  const open = ()=>{ drawer.classList.add('open'); overlay.classList.add('show'); };
+  const close = ()=>{ drawer.classList.remove('open'); overlay.classList.remove('show'); };
+  btn.addEventListener('click', open);
+  overlay.addEventListener('click', close);
+  document.addEventListener('keydown', (e)=>{ if (e.key==='Escape') close(); });
+}
+
+function buildFooter(){
+  const el = document.querySelector('.footer .links');
+  if (!el) return;
+  const wa = WHATSAPP_NUMBER.replace(/[^0-9]/g,'');
+  el.innerHTML = `
+    <a href="index.html">Home</a>
+    <a href="products.html">Products</a>
+    <a href="news.html">News</a>
+    <a href="https://wa.me/${wa}" target="_blank" rel="noopener">WhatsApp</a>`;
+}
+
+function showSplashOnce(){
+  if (sessionStorage.getItem('byteclave_splash_shown')==='1') return;
+  const s = document.createElement('div');
+  s.id = 'splash';
+  s.innerHTML = `<div class="box">
+    <h1 class="glow">ByteClave</h1>
+    <p>Your Digital Hub for AI, Apps & Resources</p>
+  </div>`;
+  document.body.appendChild(s);
+  setTimeout(()=>{ s.style.opacity = '0'; setTimeout(()=>{ s.remove(); sessionStorage.setItem('byteclave_splash_shown','1'); }, 500); }, 2200);
+}
+
+function initLayout(){
+  buildDrawerHTML();
+  bindDrawer();
+  buildFooter();
+  const y = document.getElementById('year'); if (y) y.textContent = new Date().getFullYear();
+  showSplashOnce();
+  renderCartCount();
+}
+
 // SEO helpers
 export function setMeta({ title, description, image, url }) {
   if (title) document.title = title;
@@ -191,4 +255,8 @@ document.addEventListener('click', (e)=>{
   showPreview(link);
 });
 
-if (document.readyState !== 'loading') renderHome(); else document.addEventListener('DOMContentLoaded', renderHome);
+function boot(){
+  initLayout();
+  renderHome();
+}
+if (document.readyState !== 'loading') boot(); else document.addEventListener('DOMContentLoaded', boot);

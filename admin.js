@@ -83,6 +83,14 @@ function initProductForm(){
     let externalLink = form.elements['externalLink'].value.trim();
     const assetFile = document.getElementById('assetFile').files[0];
     if (assetFile){ assetUrl = await uploadFile(assetFile, 'assets/'); fileSize = assetFile.size; if (!format) format = detectFormatFromName(assetFile.name); }
+    if (!assetFile && externalLink){
+      // Format guess from link
+      const u = externalLink.toLowerCase();
+      const guessed = ['.pdf','.apk','.zip','.vsix'].find(ext => u.endsWith(ext));
+      if (!format && guessed) format = guessed.replace('.', '').toUpperCase();
+    }
+    // Convert file size to KB if too large
+    if (fileSize > 0) fileSize = Math.round(fileSize / 1024);
 
     const payload = {
       title: form.elements['title'].value,
@@ -97,6 +105,9 @@ function initProductForm(){
       license: form.elements['license'].value,
       published: document.getElementById('published').checked
     };
+    // Simple validations
+    if (!payload.title) { toast('Title required'); return; }
+    if (!payload.category) { toast('Category required'); return; }
     const created = await createProduct(payload);
     toast('Saved product');
     form.reset(); document.getElementById('desc').innerHTML='';

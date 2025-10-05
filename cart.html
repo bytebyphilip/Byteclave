@@ -10,14 +10,15 @@
 <body>
 <header class="header">
   <div class="inner container">
+    <button id="menuBtn" class="hamburger" aria-label="Open menu"><span></span></button>
     <div class="logo"><img src="assets/logo.png" alt=""/>ByteClave</div>
     <nav class="nav">
-      <a href="products.html">Products</a>
-      <a href="news.html">News</a>
-      <a href="admin.html">Admin</a>
+      
     </nav>
   </div>
 </header>
+<aside id="drawer" class="drawer"></aside>
+<div id="drawerOverlay" class="drawer-overlay"></div>
 <main class="container">
   <h2>Your Cart</h2>
   <div id="items"></div>
@@ -27,8 +28,9 @@
     <button id="clear" class="btn secondary">Clear cart</button>
   </div>
 </main>
-<footer class="footer"><div class="inner container">© <span id="year"></span> ByteClave</div></footer>
+<footer class="footer"><div class="inner container"><div>© <span id="year"></span> ByteClave</div><div class="links"></div></div></footer>
 <script type="module">
+  import './app.js';
   import { getCart, saveCart, removeFromCart, clearCart, cartWhatsAppLink } from './app.js';
   function render(){
     const c = getCart();

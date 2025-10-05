@@ -13,15 +13,15 @@
 <body>
 <header class="header">
   <div class="inner container">
+    <button id="menuBtn" class="hamburger" aria-label="Open menu"><span></span></button>
     <div class="logo"><img src="assets/logo.png" alt=""/>ByteClave</div>
     <nav class="nav">
-      <a href="index.html">Home</a>
-      <a href="products.html">Products</a>
       <a href="cart.html">Cart <span id="cartCount" class="badge"></span></a>
-      <a href="admin.html">Admin</a>
     </nav>
   </div>
 </header>
+<aside id="drawer" class="drawer"></aside>
+<div id="drawerOverlay" class="drawer-overlay"></div>
 <main class="container">
   <div style="display:flex;gap:16px;align-items:center;justify-content:space-between">
     <h2>News & Articles</h2>
@@ -32,7 +32,8 @@
   </div>
   <div id="articles" class="grid" style="margin-top:12px"></div>
 </main>
-<footer class="footer"><div class="inner container">© <span id="year"></span> ByteClave</div></footer>
+<footer class="footer"><div class="inner container"><div>© <span id="year"></span> ByteClave</div><div class="links"></div></div></footer>
+<script type="module">import './app.js';</script>
 <script type="module" src="news.js"></script>
 </body>
 </html>

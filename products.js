@@ -9,10 +9,12 @@ async function initFilters(){
   state.categories = await getCategories(DEFAULT_TAXONOMY);
   const url = new URL(location.href);
   const initialCategory = url.searchParams.get('category') || '';
+  const initialSub = url.searchParams.get('subcategory') || '';
   const fCategory = $('fCategory');
   fCategory.innerHTML = `<option value="">All</option>` + state.categories.map(c=>`<option value="${c.name}">${c.name}</option>`).join('');
   fCategory.value = initialCategory;
   updateSubcategories();
+  if (initialSub) $('fSubcategory').value = initialSub;
   const tags = await getAllTags();
   $('fTags').setAttribute('list','tags');
   let dl = document.createElement('datalist'); dl.id='tags'; dl.innerHTML = tags.map(t=>`<option value="${t}">`).join(''); document.body.appendChild(dl);
