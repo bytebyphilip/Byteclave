@@ -41,6 +41,8 @@ img{max-width:100%;display:block}
 .btn.secondary{background:#1b2433;color:#c7d0e3}
 .btn.ghost{background:transparent;border:1px solid #2a3347;color:#c7d0e3}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.grid.cards-compact{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.grid.cards-tiles{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
 .card{background:var(--card);border:1px solid #1a2030;border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
 .card .thumb{height:160px;background:#0f121a;display:flex;align-items:center;justify-content:center}
 .card .content{padding:12px}
@@ -55,9 +57,12 @@ img{max-width:100%;display:block}
 .table{width:100%;border-collapse:collapse}
 .table th,.table td{padding:8px;border-bottom:1px solid #1c2333;text-align:left}
 .kbd{font:11px monospace;background:#121522;border:1px solid #232945;border-radius:6px;padding:2px 6px}
+.kbd.danger{border-color:#4a1f2a;color:#ff9aa7;background:#1a0f13}
 .toast{position:fixed;right:16px;bottom:16px;background:#0f1522;border:1px solid #1a2135;padding:10px 12px;border-radius:10px}
 .lazy{filter:blur(8px);}
 .sidebar{background:#0f131c;border:1px solid #1a2030;border-radius:12px;padding:12px}
+.sidebar a{color:#cfe3ff}
+.sidebar a:hover{color:#76d7f9}
 .sidebar a{color:#cfe3ff}
 .sidebar a:hover{color:#76d7f9}
 .filters{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
@@ -65,6 +70,7 @@ img{max-width:100%;display:block}
 @media(max-width:560px){.filters{grid-template-columns:1fr}}
 
 /* Splash */
+#categoryHero.card.hero-banner{background:linear-gradient(135deg, rgba(118,215,249,.18), rgba(178,125,251,.18)); border:1px solid #233252}
 #splash{position:fixed;inset:0;z-index:100;background:radial-gradient(80% 80% at 50% 20%, rgba(118,215,249,.2), rgba(7,9,16,1));display:flex;align-items:center;justify-content:center;transition:opacity .5s ease}
 #splash .box{text-align:center}
 #splash h1{font-size:38px;margin:0 0 6px;text-shadow:0 0 24px rgba(118,215,249,.4)}

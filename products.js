@@ -60,7 +60,7 @@ function applyPagination(){
   const sub = $('fSubcategory').value;
   // Category hero/sections
   const hero = $('categoryHero'); const sections = $('catSections'); const gridWrap = document.getElementById('gridWrap');
-  if (cat){ hero.style.display='block'; hero.innerHTML = `<h3>${cat}</h3><p style="color:#9fb0c9">${(state.categories.find(c=>c.name===cat)||{}).purpose||''}</p>`; }
+  if (cat){ hero.style.display='block'; hero.classList.add('hero-banner'); hero.innerHTML = `<h3>${cat}</h3><p style="color:#9fb0c9">${(state.categories.find(c=>c.name===cat)||{}).purpose||''}</p>`; }
   else { hero.style.display='none'; }
   sections.style.display = 'none';
   if (cat === 'AI PROMPTS') {

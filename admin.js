@@ -139,9 +139,9 @@ async function renderProductsTable(){
       <td>
         <a class=\"kbd\" href=\"product.html?slug=${encodeURIComponent(p.slug)}\" target=\"_blank\">view</a>
         <button class=\"kbd\" data-edit=\"${p.id}\">edit</button>
-        <button class=\"kbd\" data-del=\"${p.id}\">soft delete</button>
+        <button class=\"kbd danger\" data-del=\"${p.id}\">soft delete</button>
         <button class=\"kbd\" data-res=\"${p.id}\">restore</button>
-        <button class=\"kbd\" data-hard=\"${p.id}\">delete</button>
+        <button class=\"kbd danger\" data-hard=\"${p.id}\">delete</button>
       </td>
     </tr>`));
   document.getElementById('productsTable').innerHTML = rows.join('');
