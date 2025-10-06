@@ -1,6 +1,6 @@
-// storage.js - Firebase Storage uploads with client-side image compression
-import { storage } from './firebase.js';
-import { ref, uploadBytesResumable, getDownloadURL } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js';
+// storage.js (Firebase-free) - Local file storage using data URLs
+// Uses client-side compression where applicable, then stores in IndexedDB via filestore.js
+import { saveToLocal } from './filestore.js';
 
 export function detectFormatFromName(name=''){
   const n = name.toLowerCase();
@@ -59,29 +59,18 @@ async function bitmapToImage(bitmap){
   });
 }
 
-export async function uploadFile(file, pathPrefix='uploads/'){
+export async function uploadFile(file, _pathPrefix='uploads/'){
   const toUpload = await compressImageIfNeeded(file);
-  const id = `${Date.now()}-${Math.random().toString(36).slice(2,8)}-${file.name}`;
-  const storageRef = ref(storage, `${pathPrefix}${id}`);
-  await new Promise((resolve, reject)=>{
-    const task = uploadBytesResumable(storageRef, toUpload);
-    task.on('state_changed', ()=>{}, reject, resolve);
-  });
-  const url = await getDownloadURL(storageRef);
-  return url;
+  const saved = await saveToLocal(toUpload);
+  return saved.url; // data URL
 }
 
 // Same as uploadFile but allows a progress callback (0-100)
-export async function uploadFileWithProgress(file, pathPrefix='uploads/', onProgress){
+export async function uploadFileWithProgress(file, _pathPrefix='uploads/', onProgress){
   const toUpload = await compressImageIfNeeded(file);
-  const id = `${Date.now()}-${Math.random().toString(36).slice(2,8)}-${file.name}`;
-  const storageRef = ref(storage, `${pathPrefix}${id}`);
-  await new Promise((resolve, reject)=>{
-    const task = uploadBytesResumable(storageRef, toUpload);
-    task.on('state_changed', (snap)=>{
-      if (onProgress && snap.total) onProgress(Math.round((snap.bytesTransferred / snap.total) * 100));
-    }, reject, resolve);
-  });
-  const url = await getDownloadURL(storageRef);
-  return url;
+  // Simulate progress for local save to keep UI feedback consistent
+  if (onProgress){ onProgress(15); setTimeout(()=> onProgress(55), 80); setTimeout(()=> onProgress(85), 160); }
+  const saved = await saveToLocal(toUpload);
+  if (onProgress){ setTimeout(()=> onProgress(100), 60); }
+  return saved.url;
 }

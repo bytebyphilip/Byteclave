@@ -137,13 +137,15 @@
       </div>
     </div>
 
-    <div class="card" style="padding:16px;margin-top:12px">
+      <div class="card" style="padding:16px;margin-top:12px">
       <h3>Developer Tools</h3>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button id="btnExport" class="btn">Export local backup</button>
         <label class="btn secondary" for="importFile">Import backup</label>
         <input id="importFile" type="file" accept="application/json" style="display:none"/>
-        <button id="btnTestWrite" class="btn ghost">Test Firestore write</button>
+          <button id="btnExportProducts" class="btn ghost">Export products.json</button>
+          <button id="btnExportArticles" class="btn ghost">Export articles.json</button>
+          <button id="btnExportCategories" class="btn ghost">Export categories.json</button>
       </div>
       <pre id="debugOut" style="margin-top:10px;background:#0f141d;border:1px solid #1a2030;border-radius:8px;padding:8px;max-height:200px;overflow:auto"></pre>
     </div>

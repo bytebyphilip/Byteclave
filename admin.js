@@ -322,11 +322,22 @@ function initDevTools(){
   document.getElementById('importFile').addEventListener('change', async (ev)=>{
     try { const f = ev.target.files[0]; if (!f) return; const text = await f.text(); const json = JSON.parse(text); out.textContent = 'Imported JSON with keys: '+Object.keys(json).join(', '); } catch (e){ out.textContent = 'Import error: '+e.message; }
   });
-  document.getElementById('btnTestWrite').addEventListener('click', async ()=>{
-    try {
-      await createArticle({ title: 'Test Write '+Date.now(), slug: 'test-'+Date.now(), excerpt: 'debug', body: '', image: '', author: 'system', publishedAt: new Date().toISOString(), externalUrl: null });
-      out.textContent = 'Firestore write OK';
-    } catch (e) { out.textContent = 'Firestore write FAILED: '+(e.message||String(e)); }
+  // Simple exports for local-only mode
+  const exportJson = async (name, rows)=>{
+    const blob = new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  };
+  document.getElementById('btnExportProducts').addEventListener('click', async ()=>{
+    await exportJson('products.json', await listProducts({ limitNum: 5000 }));
+    out.textContent = 'Exported products.json';
+  });
+  document.getElementById('btnExportArticles').addEventListener('click', async ()=>{
+    await exportJson('articles.json', await listArticles({ limitNum: 5000 }));
+    out.textContent = 'Exported articles.json';
+  });
+  document.getElementById('btnExportCategories').addEventListener('click', async ()=>{
+    await exportJson('categories.json', await getCategories());
+    out.textContent = 'Exported categories.json';
   });
 }
 
