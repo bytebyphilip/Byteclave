@@ -60,9 +60,10 @@ function buildDrawerHTML(){
     <h3 style="margin-top:0">ByteClave</h3>
     <nav>
       <a href="index.html">Home</a>
-      <a href="products.html?category=${encodeURIComponent('Tools & Scripts')}">AI Tools</a>
-      <a href="products.html?category=Apps">Apps</a>
-      <a href="products.html?category=Courses">Courses</a>
+      <a href="categories/ai-prompts.html">AI PROMPTS</a>
+      <a href="categories/ai-tools.html">AI TOOLS</a>
+      <a href="categories/apps.html">APPS</a>
+      <a href="categories/courses.html">COURSES</a>
       <a href="news.html">Articles / News</a>
       <a href="index.html#about">About ByteClave</a>
       <a href="https://wa.me/${wa}" target="_blank" rel="noopener">Contact / WhatsApp</a>
