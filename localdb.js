@@ -3,7 +3,7 @@
 
 const DB_NAME = 'byteclave_localdb_v1';
 const DB_VERSION = 1;
-const STORES = ['products','articles','categories','settings'];
+const STORES = ['products','articles','categories','settings','files'];
 
 function openDB(){
   return new Promise((resolve, reject)=>{

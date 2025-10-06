@@ -1,12 +1,15 @@
 import { productCardHTML, lazyObserve, delegateAddToCart, renderCartCount, cache, DEFAULT_TAXONOMY, openModal, copyToClipboard, waLink, getCategoryMeta } from './app.js';
 import { listProducts, getCategories, getAllTags } from './firestore-helpers.js';
+import { Backend } from './backend.js';
 
 const state = { page: 1, perPage: 12, items: [], filtered: [], categories: [] };
 
 function $(id){ return document.getElementById(id); }
 
 async function initFilters(){
-  state.categories = await getCategories(DEFAULT_TAXONOMY);
+  // Prefer local backend categories for richer UI if available
+  try { state.categories = await Backend.listCategories(); }
+  catch { state.categories = await getCategories(DEFAULT_TAXONOMY); }
   const url = new URL(location.href);
   const initialCategory = url.searchParams.get('category') || '';
   const initialSub = url.searchParams.get('subcategory') || '';
@@ -67,8 +70,15 @@ function applyPagination(){
   }
   else { hero.style.display='none'; }
   sections.style.display = 'none';
-  if (cat === 'AI PROMPTS') {
+  if (cat === 'AI PROMPTS' && !sub) {
+    // Show subcategory cards
+    const thisCat = state.categories.find(c=>c.name===cat) || { subcategories: [] };
+    $('grid').innerHTML = thisCat.subcategories.map(s=> subcategoryCard(cat, s)).join('');
+  } else if (cat === 'AI PROMPTS'){
     $('grid').innerHTML = state.filtered.map(promptCardHTML).join('');
+  } else if (cat === 'AI TOOLS' && !sub){
+    const thisCat = state.categories.find(c=>c.name===cat) || { subcategories: [] };
+    $('grid').innerHTML = thisCat.subcategories.map(s=> subcategoryCard(cat, s)).join('');
   } else if (cat === 'AI TOOLS' && sub === 'PDFs & Cheat Sheets'){
     $('grid').innerHTML = state.filtered.map(pdfCheatCardHTML).join('');
   } else if (cat === 'AI TOOLS' && sub === 'Scripts & Extensions'){
@@ -79,8 +89,14 @@ function applyPagination(){
     $('grid').innerHTML = state.filtered.map(templateCardHTML).join('');
   } else if (cat === 'AI TOOLS' && sub === 'API Projects'){
     $('grid').innerHTML = state.filtered.map(apiProjectCardHTML).join('');
+  } else if (cat === 'COURSES' && !sub){
+    const thisCat = state.categories.find(c=>c.name===cat) || { subcategories: [] };
+    $('grid').innerHTML = thisCat.subcategories.map(s=> subcategoryCard(cat, s)).join('');
   } else if (cat === 'COURSES'){
     $('grid').innerHTML = state.filtered.map(courseCardHTML).join('');
+  } else if (cat === 'APPS' && !sub){
+    const thisCat = state.categories.find(c=>c.name===cat) || { subcategories: [] };
+    $('grid').innerHTML = thisCat.subcategories.map(s=> subcategoryCard(cat, s)).join('');
   } else if (cat === 'APPS'){
     $('grid').innerHTML = state.filtered.map(appsVariantCardHTML).join('');
   } else {
