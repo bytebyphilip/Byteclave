@@ -1,5 +1,6 @@
 import { seedDefaultCategoriesIfEmpty, getCategories, validateCategorySelection, createProduct, createProductLocal, listProducts, updateProduct, softDeleteProduct, restoreProduct, hardDeleteProduct, getAllTags, createArticle, listArticles, getRSSFeeds, setRSSFeeds, upsertCategory, deleteCategory, resetCategoriesToDefault, getProductById, updateArticle, deleteArticle } from './firestore-helpers.js';
 import { uploadFile, detectFormatFromName, uploadFileWithProgress } from './storage.js';
+import { saveToLocal } from './filestore.js';
 import { ADMIN_PASSWORD, slugify, ensureUniqueSlug } from './app.js';
 
 function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; setTimeout(()=> t.style.display='none', 2000); }
@@ -73,19 +74,26 @@ function initProductForm(){
     let imageUrl = '';
     const prog = document.getElementById('uploadProgress');
     const imageFile = document.getElementById('imageFile').files[0];
-    if (imageFile) imageUrl = await uploadFileWithProgress(imageFile, 'images/', (v)=>{ prog.value = v; });
+    if (imageFile){
+      try { imageUrl = await uploadFileWithProgress(imageFile, 'images/', (v)=>{ prog.value = v; }); }
+      catch { const local = await saveToLocal(imageFile); imageUrl = local.url; }
+    }
 
     const previewFiles = Array.from(document.getElementById('previewFiles').files||[]);
     const previewPages = [];
     const thumbs = document.getElementById('previewThumbs'); thumbs.innerHTML='';
-    for (const f of previewFiles){ const url = await uploadFileWithProgress(f, 'previews/', (v)=>{ prog.value = v; }); previewPages.push(url); const img = new Image(); img.src = url; img.style.width='64px'; img.style.height='64px'; img.style.objectFit='cover'; img.style.borderRadius='8px'; thumbs.appendChild(img); }
+    for (const f of previewFiles){ let url=''; try { url = await uploadFileWithProgress(f, 'previews/', (v)=>{ prog.value = v; }); } catch { url = (await saveToLocal(f)).url; } previewPages.push(url); const img = new Image(); img.src = url; img.style.width='64px'; img.style.height='64px'; img.style.objectFit='cover'; img.style.borderRadius='8px'; thumbs.appendChild(img); }
 
     let assetUrl = '';
     let fileSize = 0;
     let format = form.elements['format'].value;
     let externalLink = form.elements['externalLink'].value.trim();
     const assetFile = document.getElementById('assetFile').files[0];
-    if (assetFile){ assetUrl = await uploadFileWithProgress(assetFile, 'assets/', (v)=>{ prog.value = v; }); fileSize = assetFile.size; if (!format) format = detectFormatFromName(assetFile.name); }
+    if (assetFile){
+      try { assetUrl = await uploadFileWithProgress(assetFile, 'assets/', (v)=>{ prog.value = v; }); }
+      catch { assetUrl = (await saveToLocal(assetFile)).url; }
+      fileSize = assetFile.size; if (!format) format = detectFormatFromName(assetFile.name);
+    }
     if (!assetFile && externalLink){
       // Format guess from link
       const u = externalLink.toLowerCase();
