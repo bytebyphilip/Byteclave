@@ -95,15 +95,96 @@ function buildFooter(){
 }
 
 function showSplashOnce(){
-  if (sessionStorage.getItem('byteclave_splash_shown')==='1') return;
-  const s = document.createElement('div');
-  s.id = 'splash';
-  s.innerHTML = `<div class="box">
-    <h1 class="glow">ByteClave</h1>
-    <p>Your Digital Hub for AI, Apps & Resources</p>
-  </div>`;
-  document.body.appendChild(s);
-  setTimeout(()=>{ s.style.opacity = '0'; setTimeout(()=>{ s.remove(); sessionStorage.setItem('byteclave_splash_shown','1'); }, 500); }, 2200);
+  const SPLASH_DURATION_MS = 4000;
+  if (sessionStorage.getItem('byteclave_splash_shown') === '1') return;
+
+  // Inject styles once
+  const STYLE_ID = 'bc-splash-styles';
+  if (!document.getElementById(STYLE_ID)){
+    const styleEl = document.createElement('style');
+    styleEl.id = STYLE_ID;
+    styleEl.textContent = `
+      /* Splash overlay */
+      #bc-splash{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;overflow:hidden;
+        background: linear-gradient(160deg, #04040a 0%, #0d0d17 100%); opacity:0; transform:scale(1.02); transition:opacity .6s ease, transform .6s ease}
+      #bc-splash.show{opacity:1; transform:none}
+      #bc-splash.hide{opacity:0; transform:translateY(-8px) scale(.98)}
+      #bc-splash .stage{position:relative; width:min(92vw, 760px); text-align:center; padding:24px}
+      #bc-splash .logo-wrap{position:relative; display:inline-block}
+      #bc-splash .logo-wrap:before{content:""; position:absolute; left:50%; top:50%; width:260px; height:260px; transform:translate(-50%,-50%);
+        background: radial-gradient(closest-side at 50% 50%, rgba(0,216,255,.32), rgba(0,216,255,0) 70%);
+        filter: blur(18px); border-radius:50%; animation: bc-orb 4s ease-in-out infinite alternate}
+      #bc-splash img.logo{width:min(160px, 40vw); height:auto; display:block; margin:0 auto; transform:scale(.94);
+        filter: drop-shadow(0 0 22px rgba(56,190,255,.45)) drop-shadow(0 0 8px rgba(56,190,255,.24));
+        animation: bc-logo-in .9s cubic-bezier(.16,.84,.44,1) forwards .25s}
+      #bc-splash h1{margin:16px 0 4px; font-size:clamp(28px, 6vw, 48px); line-height:1.1; font-weight:800; letter-spacing:.4px;
+        color:#fff; text-shadow:0 0 28px rgba(118,215,249,.55), 0 0 6px rgba(118,215,249,.35)}
+      #bc-splash .tag{color:#c7d7ee; font-size:clamp(13px, 2.8vw, 18px)}
+      #bc-splash .spinner{width:34px;height:34px;border:3px solid rgba(255,255,255,.18);border-top-color:#76d7f9;border-radius:50%;margin:18px auto 0;animation:bc-spin 1s linear infinite}
+      #bc-splash .particles{position:absolute; inset:0; pointer-events:none}
+      #bc-splash .particle{position:absolute; width:6px; height:6px; background: radial-gradient(circle, rgba(255,255,255,.9), rgba(255,255,255,0) 70%);
+        border-radius:50%; opacity:.12; filter:blur(.5px)}
+      @keyframes bc-spin{to{transform:rotate(360deg)}}
+      @keyframes bc-logo-in{to{transform:scale(1)}}
+      @keyframes bc-orb{to{transform:translate(-50%,-50%) scale(1.06)}}
+      @keyframes bc-float{0%{transform:translateY(0)}50%{transform:translateY(-12px)}100%{transform:translateY(0)}}
+      @keyframes bc-twinkle{0%,100%{opacity:.08}50%{opacity:.22}}
+      /* Prevent scroll while splash visible */
+      html.bc-splash-lock, body.bc-splash-lock{overflow:hidden}
+    `;
+    document.head.appendChild(styleEl);
+  }
+
+  // Build splash DOM
+  const splashEl = document.createElement('div');
+  splashEl.id = 'bc-splash';
+  splashEl.innerHTML = `
+    <div class="particles" aria-hidden="true"></div>
+    <div class="stage">
+      <div class="logo-wrap">
+        <img class="logo" src="assets/logo.png" alt="ByteClave logo"/>
+      </div>
+      <h1>ByteClave</h1>
+      <div class="tag">Your Digital Hub for AI, Apps & Resources</div>
+      <div class="spinner" role="status" aria-label="Loading"></div>
+    </div>`;
+
+  document.body.appendChild(splashEl);
+  document.documentElement.classList.add('bc-splash-lock');
+  document.body.classList.add('bc-splash-lock');
+
+  // Add subtle particles
+  const particleContainer = splashEl.querySelector('.particles');
+  const particleCount = 16;
+  for (let i = 0; i < particleCount; i++){
+    const dot = document.createElement('span');
+    dot.className = 'particle';
+    const left = Math.random() * 100;
+    const top = Math.random() * 100;
+    const size = 3 + Math.random() * 5; // 3-8px visual size via transform scale
+    const duration = 6 + Math.random() * 8; // 6s - 14s
+    const delay = Math.random() * 4;
+    dot.style.left = left + '%';
+    dot.style.top = top + '%';
+    dot.style.transform = `translate(-50%,-50%) scale(${size/6})`;
+    dot.style.animation = `bc-float ${duration}s ease-in-out ${delay}s infinite, bc-twinkle ${duration*0.8}s ease-in-out ${delay/2}s infinite alternate`;
+    particleContainer.appendChild(dot);
+  }
+
+  // Play intro
+  requestAnimationFrame(()=> splashEl.classList.add('show'));
+
+  // Hide after duration
+  const end = () => {
+    splashEl.classList.add('hide');
+    setTimeout(()=>{
+      splashEl.remove();
+      document.documentElement.classList.remove('bc-splash-lock');
+      document.body.classList.remove('bc-splash-lock');
+      try { sessionStorage.setItem('byteclave_splash_shown','1'); } catch {}
+    }, 650);
+  };
+  setTimeout(end, SPLASH_DURATION_MS);
 }
 
 function initLayout(){
