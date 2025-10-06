@@ -20,13 +20,19 @@ async function mergeRSS(local){
   for (const r of results){
     if (r.status==='fulfilled' && r.value && Array.isArray(r.value.items)){
       for (const it of r.value.items){
+        // Try to resolve a usable image: prefer enclosure, media, or parse from description
+        let img = (it.enclosure?.url || it.enclosure?.link || it.thumbnail || '');
+        if (!img && typeof it.description === 'string'){
+          const m = it.description.match(/<img[^>]+src=["']([^"']+)["']/i);
+          if (m) img = m[1];
+        }
         rssItems.push({
           id: it.guid || it.link,
           title: it.title,
           slug: (it.title||'').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,''),
           excerpt: it.description || '',
           body: '',
-          image: (it.thumbnail || it.enclosure?.link || 'assets/default-news.jpg'),
+          image: (img || 'assets/default-news.jpg'),
           author: it.author || 'News',
           publishedAt: it.pubDate || new Date().toISOString(),
           externalUrl: it.link
